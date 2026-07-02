@@ -4,9 +4,10 @@
 HISTFILE=~/.zsh_history
 HISTSIZE=10000
 SAVEHIST=10000
+
 setopt SHARE_HISTORY
 setopt HIST_IGNORE_DUPS
-
+setopt AUTO_CD
 # Prompt (Starship)
 eval "$(starship init zsh)"
 
