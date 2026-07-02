@@ -33,3 +33,11 @@ export PATH="/home/adithya/.local/bin:$PATH"
 # CUDA
 export CUDA_PATH="/opt/cuda"
 export PATH="$PATH:$CUDA_PATH/bin"
+# YAZI shortcut
+function y() {
+	local tmp="$(mktemp -t "yazi-cwd.XXXXXX")" cwd
+	command yazi "$@" --cwd-file="$tmp"
+	IFS= read -r -d '' cwd < "$tmp"
+	[ "$cwd" != "$PWD" ] && [ -d "$cwd" ] && builtin cd -- "$cwd"
+	command rm -f -- "$tmp"
+}

@@ -41,7 +41,10 @@ install_packages() {
 	starship \
 	zsh-syntax-highlighting \
 	zsh-autosuggestions \
-	openconnect
+	openconnect \
+	calcurse \
+	spectacle \
+	yazi
 
     # AUR Packages (EndeavourOS comes with yay pre-installed)
     print_step "Installing AUR Packages..."

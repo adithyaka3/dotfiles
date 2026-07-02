@@ -64,6 +64,8 @@ Plug 'stevearc/oil.nvim'
 Plug 'akinsho/toggleterm.nvim', {'tag': '*'}
 Plug 'tiagovla/scope.nvim'
 Plug 'MeanderingProgrammer/render-markdown.nvim'
+Plug 'williamboman/mason.nvim'
+Plug 'williamboman/mason-lspconfig.nvim'
 call plug#end()
 
 " =========================
@@ -217,6 +219,8 @@ vim.api.nvim_create_autocmd('LspAttach', {
     vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
     vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
     vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
+    vim.keymap.set('n', '<C-]>', vim.lsp.buf.definition, opts)
+    vim.keymap.set('n', '<C-t>', '<C-o>', opts)
     vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts)
     vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, opts)
     vim.keymap.set('n', '<leader>f', function() vim.lsp.buf.format { async = true } end, opts)
@@ -225,23 +229,21 @@ vim.api.nvim_create_autocmd('LspAttach', {
 
 local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
--- Clangd
-vim.lsp.config('clangd', {
-  cmd = { 'clangd', '--background-index', '--offset-encoding=utf-16' },
-  capabilities = capabilities,
+require("mason").setup()
+require("mason-lspconfig").setup({
+  ensure_installed = { "clangd", "pyright" },
+  handlers = {
+    function(server_name)
+      local opts = { capabilities = capabilities }
+      if server_name == "pyright" then
+        opts.settings = {
+          python = { pythonPath = "/home/adi/myenv/bin/python" }
+        }
+      end
+      require("lspconfig")[server_name].setup(opts)
+    end,
+  },
 })
-vim.lsp.enable('clangd')
-
--- Pyright
-vim.lsp.config('pyright', {
-  capabilities = capabilities,
-  settings = {
-    python = {
-      pythonPath = "/home/adi/myenv/bin/python"
-    }
-  }
-})
-vim.lsp.enable('pyright')
 
 -- 6. SETUP SCOPE
 require("scope").setup()
