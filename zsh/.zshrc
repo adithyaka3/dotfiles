@@ -22,6 +22,8 @@ alias vim='nvim'
 
 # Key bindings
 bindkey -e
+bindkey "\e[1;5D" backward-word
+bindkey "\e[1;5C" forward-word
 
 # Plugins
 source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
