@@ -2,7 +2,18 @@
 let mapleader = " "
 let g:mapleader = " "
 let g:python3_host_prog = '/home/adithya/.venv/bin/python'
+
+" Set the trigger keys
+let g:UltiSnipsExpandTrigger = "<tab>"
+let g:UltiSnipsJumpForwardTrigger = "<tab>"
+let g:UltiSnipsJumpBackwardTrigger = "<s-tab>"
+
+" Tell UltiSnips where to look for your personal snippets
+let g:UltiSnipsSnippetDirectories = ['UltiSnips']
+
+
 nnoremap <Space> <Nop>
+nnoremap ; :
 vnoremap <Space> <Nop>
 
 " Move by display lines instead of physical lines
@@ -40,14 +51,16 @@ set wildmenu
 call plug#begin('~/.vim/plugged')
 Plug 'karb94/neoscroll.nvim'
 Plug 'lukas-reineke/indent-blankline.nvim'
-" LSP & Completion
-Plug 'neovim/nvim-lspconfig'
+" Completion
 Plug 'hrsh7th/nvim-cmp'
 Plug 'hrsh7th/cmp-nvim-lsp'
 Plug 'hrsh7th/cmp-path'
 Plug 'quangnguyen30192/cmp-nvim-ultisnips'
 Plug 'SirVer/ultisnips'
 Plug 'windwp/nvim-autopairs'
+
+" Snippets
+Plug 'SirVer/ultisnips'
 
 " UI & Utils
 Plug 'nikolvs/vim-sunbather'
@@ -66,6 +79,8 @@ Plug 'tiagovla/scope.nvim'
 Plug 'MeanderingProgrammer/render-markdown.nvim'
 Plug 'williamboman/mason.nvim'
 Plug 'williamboman/mason-lspconfig.nvim'
+" LSP
+Plug 'neovim/nvim-lspconfig'
 call plug#end()
 
 " =========================
@@ -214,36 +229,62 @@ vim.api.nvim_create_autocmd('LspAttach', {
   callback = function(args)
     local bufnr = args.buf
     local opts = { buffer = bufnr, silent = true }
-    vim.keymap.set('n', '[d', vim.diagnostic.goto_prev, opts)
-    vim.keymap.set('n', ']d', vim.diagnostic.goto_next, opts)
+    vim.keymap.set('n', '[d', function() vim.diagnostic.jump({ count = -1 }) end, opts)
+    vim.keymap.set('n', ']d', function() vim.diagnostic.jump({ count = 1 }) end, opts)
     vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
     vim.keymap.set('n', 'gr', vim.lsp.buf.references, opts)
     vim.keymap.set('n', 'K', vim.lsp.buf.hover, opts)
-    vim.keymap.set('n', '<C-]>', vim.lsp.buf.definition, opts)
-    vim.keymap.set('n', '<C-t>', '<C-o>', opts)
     vim.keymap.set('n', '<leader>rn', vim.lsp.buf.rename, opts)
     vim.keymap.set('n', '<leader>ca', vim.lsp.buf.code_action, opts)
     vim.keymap.set('n', '<leader>f', function() vim.lsp.buf.format { async = true } end, opts)
   end,
 })
 
+vim.keymap.set('n', '<C-]>', function()
+  if #vim.lsp.get_clients({ bufnr = 0 }) > 0 then
+    vim.lsp.buf.definition()
+  else
+    vim.cmd('tag ' .. vim.fn.expand('<cword>'))
+  end
+end, { silent = true })
+
+vim.keymap.set('n', '<C-t>', '<C-o>', { silent = true })
+
 local capabilities = require('cmp_nvim_lsp').default_capabilities()
 
 require("mason").setup()
 require("mason-lspconfig").setup({
   ensure_installed = { "clangd", "pyright" },
-  handlers = {
-    function(server_name)
-      local opts = { capabilities = capabilities }
-      if server_name == "pyright" then
-        opts.settings = {
-          python = { pythonPath = "/home/adi/myenv/bin/python" }
-        }
-      end
-      require("lspconfig")[server_name].setup(opts)
-    end,
+})
+
+vim.lsp.config('clangd', {
+  capabilities = capabilities,
+  root_dir = function(bufnr, on_dir)
+    local fname = vim.api.nvim_buf_get_name(bufnr)
+    local root = vim.fs.root(fname, { '.clangd', 'compile_commands.json', 'compile_flags.txt', '.git' })
+    on_dir(root or vim.fn.getcwd())
+  end,
+})
+
+vim.lsp.config('pyright', {
+  capabilities = capabilities,
+  root_dir = function(bufnr, on_dir)
+    local fname = vim.api.nvim_buf_get_name(bufnr)
+    local root = vim.fs.root(fname, { 'pyproject.toml', 'setup.py', 'setup.cfg', 'requirements.txt', 'Pipfile', '.git' })
+    on_dir(root or vim.fn.getcwd())
+  end,
+  settings = {
+    python = {
+      pythonPath = "/home/adithya/.venv/bin/python",
+      analysis = {
+        autoSearchPaths = true,
+        useLibraryCodeForTypes = true,
+      },
+    },
   },
 })
+
+vim.lsp.enable({ "clangd", "pyright" })
 
 -- 6. SETUP SCOPE
 require("scope").setup()

@@ -1,0 +1,143 @@
+snippet cf "Competitive Programming Template" b
+#include <bits/stdc++.h> // 33
+#include <ext/pb_ds/assoc_container.hpp>
+#include <ext/pb_ds/tree_policy.hpp>
+using namespace __gnu_pbds;
+template<class T>
+using ordered_set = tree<T, null_type, std::less<T>, rb_tree_tag, tree_order_statistics_node_update>;
+using namespace std;
+
+#ifdef ONLINE_JUDGE
+#pragma GCC optimize("Ofast")
+#pragma GCC optimize("unroll-loops")
+#pragma GCC target("sse,sse2,sse3,ssse3,sse4,lzcnt,popcnt,abm,mmx,avx,avx2,bmi,bmi2")
+#endif
+
+using namespace std;
+#define int long long
+#define ia(a, n) for(int i = 0;i<n;i++) cin>>a[i];
+#define endl '\n'
+#define ceil(n, m) (((n) + (m) - 1) / (m))
+#define pb push_back
+#define all(vec) vec.begin(), vec.end()
+#define rall(vec) vec.rbegin(), vec.rend()
+void solve(){
+   $1
+}
+
+signed main(){
+    auto begin = std::chrono::high_resolution_clock::now();
+    ios_base::sync_with_stdio(0);
+    cin.tie(0);
+    int t = 1;
+    cin >> t;
+    for(int i = 1; i <= t; i++) 
+    {
+        //cout << "Case #" << i << ": ";
+        solve();
+    }
+    auto end = std::chrono::high_resolution_clock::now();
+    auto elapsed = std::chrono::duration_cast<std::chrono::nanoseconds>(end - begin);
+    cerr << "Time measured: " << elapsed.count() * 1e-9 << " seconds.\n"; 
+    return 0;
+}
+endsnippet
+
+snippet combi "Combinatorics, Primes, and ModInt Template" b
+#include <bits/stdc++.h>
+using namespace std;
+
+const int MOD = 998244353;
+
+struct mint {
+    int v;
+    mint() : v(0) {}
+    mint(long long x) : v(x % MOD) { if (v < 0) v += MOD; }
+    
+    mint& operator+=(const mint& o) { v += o.v; if (v >= MOD) v -= MOD; return *this; }
+    mint& operator-=(const mint& o) { v -= o.v; if (v < 0) v += MOD; return *this; }
+    mint& operator*=(const mint& o) { v = 1LL * v * o.v % MOD; return *this; }
+    
+    friend mint operator+(mint a, const mint& b) { return a += b; }
+    friend mint operator-(mint a, const mint& b) { return a -= b; }
+    friend mint operator*(mint a, const mint& b) { return a *= b; }
+    
+    mint pow(long long k) const {
+        mint res = 1, a = *this;
+        while (k > 0) {
+            if (k & 1) res *= a;
+            a *= a;
+            k >>= 1;
+        }
+        return res;
+    }
+    
+    // Assumes MOD is prime (Fermat's Little Theorem)
+    mint inv() const { return pow(MOD - 2); }
+    
+    mint& operator/=(const mint& o) { return *this *= o.inv(); }
+    friend mint operator/(mint a, const mint& b) { return a /= b; }
+    
+    friend istream& operator>>(istream& is, mint& m) { long long x; is >> x; m = mint(x); return is; }
+    friend ostream& operator<<(ostream& os, const mint& m) { return os << m.v; }
+};
+
+// ==========================================
+// Number Theory / Combinatorics
+// ==========================================
+
+vector<int> min_prime;
+vector<int> prime_list;
+
+void precompute_spf(int n) {
+    min_prime.assign(n + 1, 0);
+    prime_list.clear();
+    for (int i = 2; i <= n; i++) {
+        if (min_prime[i] == 0) {
+            min_prime[i] = i;
+            prime_list.push_back(i);
+        }
+        for (int p : prime_list) {
+            if (p > min_prime[i] || i * p > n) break;
+            min_prime[i * p] = p;
+        }
+    }
+}
+
+vector<int> primes(int n) {
+    if (min_prime.size() <= n) precompute_spf(n);
+    vector<int> res;
+    for (int p : prime_list) {
+        if (p > n) break;
+        res.push_back(p);
+    }
+    return res;
+}
+
+int spf(int n) {
+    if (min_prime.size() <= n) precompute_spf(n);
+    return min_prime[n];
+}
+
+vector<mint> fact, invfact;
+
+void precompute_fact(int n) {
+    fact.assign(n + 1, 1);
+    invfact.assign(n + 1, 1);
+    for (int i = 1; i <= n; i++) {
+        fact[i] = fact[i - 1] * i;
+    }
+    invfact[n] = fact[n].inv();
+    for (int i = n - 1; i >= 0; i--) {
+        invfact[i] = invfact[i + 1] * (i + 1);
+    }
+}
+
+mint nCr(int n, int r) {
+    if (r < 0 || r > n) return 0;
+    if (fact.size() <= n) precompute_fact(n);
+    return fact[n] * invfact[r] * invfact[n - r];
+}
+$1
+endsnippet
+
