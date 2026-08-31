@@ -1,7 +1,7 @@
 " Set leader to Space
 let mapleader = " "
 let g:mapleader = " "
-let g:python3_host_prog = '/home/adithya/.venv/bin/python'
+let g:python3_host_prog = expand('~/.venv/bin/python')
 
 " Set the trigger keys
 let g:UltiSnipsExpandTrigger = "<tab>"
@@ -30,7 +30,7 @@ set nocompatible
 syntax on
 filetype plugin indent on
 set clipboard=unnamedplus
-set number
+set rnu
 set tabstop=2
 set shiftwidth=2
 set expandtab
@@ -81,7 +81,25 @@ Plug 'williamboman/mason.nvim'
 Plug 'williamboman/mason-lspconfig.nvim'
 " LSP
 Plug 'neovim/nvim-lspconfig'
+" jupyter notebooks
+Plug 'goerz/jupytext.vim'
+Plug 'benlubas/molten-nvim', { 'do': ':UpdateRemotePlugins' }
+
 call plug#end()
+
+" Set jupytext format to percent script (# %%)
+let g:jupytext_fmt = 'py:percent'
+
+" Molten options
+let g:molten_auto_open_output = v:true
+let g:molten_output_win_max_height = 12
+
+" Keybindings
+nnoremap mi :MoltenInit<CR>
+nnoremap e  :MoltenEvaluateOperator<CR>
+nnoremap rl :MoltenEvaluateLine<CR>
+xnoremap r  :<C-u>MoltenEvaluateVisual<CR>
+nnoremap rd :MoltenDelete<CR>
 
 " =========================
 " 3. PLUGIN CONFIG (VIMSCRIPT)
