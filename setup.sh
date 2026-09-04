@@ -27,7 +27,6 @@ install_packages() {
 	spotify-launcher \
 	obsidian \
 	pass \
-	opencode \
 	discord \
 	zellij \
 	tree \
@@ -79,7 +78,6 @@ setup_dotfiles() {
     # Run stow for each directory. This creates symlinks in your Home directory.
     stow nvim
     stow zsh
-    stow opencode-skills
 }
 
 # ---------------------------------------------------------
@@ -95,28 +93,8 @@ setup_vimplug() {
     fi
 }
 
-setup_cpos() {
-    if command -v cpos &>/dev/null; then
-        echo "CPOS is already installed."
-    else
-        print_step "Installing CPOS..."
-        curl -fsSL https://raw.githubusercontent.com/Soham109/cpos/main/install.sh | sh
-    fi
-}
-
-setup_codegraph() {
-    if command -v codegraph &>/dev/null; then
-        echo "CodeGraph is already installed."
-    else
-        print_step "Installing CodeGraph..."
-        curl -fsSL https://raw.githubusercontent.com/colbymchenry/codegraph/main/install.sh | sh
-    fi
-}
-
 setup_tools() {
     setup_vimplug
-    setup_cpos
-    setup_codegraph
 }
 
 setup_python() {
