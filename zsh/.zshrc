@@ -20,6 +20,7 @@ alias ll='ls -lah'
 alias la='ls -A'
 alias ..='cd ..'
 alias vim='nvim'
+alias ssh="kitty +kitten ssh"
 
 # Key bindings
 bindkey -e
@@ -32,6 +33,7 @@ source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zs
 
 # Local binaries
 export PATH="/home/adithya/.local/bin:$PATH"
+export EDITOR="nvim"
 
 # CUDA
 export CUDA_PATH="/opt/cuda"
